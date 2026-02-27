@@ -50,7 +50,7 @@ function App() {
   // ✅ FETCH REAL DATA FROM BACKEND
   useEffect(() => {
     const fetchData = () => {
-      fetch("http://localhost:5000/api/data")
+      fetch("https://fire-backend-ipvf.onrender.com/status")
         .then(res => res.json())
         .then(result => {
           const temp = result.temperature || 0;
