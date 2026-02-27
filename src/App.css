@@ -1,0 +1,515 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* ================= BACKGROUND ================= */
+
+.background {
+  min-height: 100vh;
+  width: 100%;
+  background-image: url("/bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  position: relative;
+}
+
+.background.dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 0;
+}
+
+/* ========================= */
+/* 🌞 CLEAN LIGHT MODE */
+/* ========================= */
+
+.background.light {
+  color: #1a1a1a;
+}
+
+/* Dashboard Glass Effect */
+.background.light .dashboard {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Header */
+.background.light h1 {
+  color: #111;
+}
+
+/* Clock */
+.background.light .clock {
+  color: #444;
+}
+
+/* Status Card */
+.background.light .status-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.background.light .status-card.safe {
+  border-left: 6px solid #2ecc71;
+}
+
+.background.light .status-card.danger {
+  border-left: 6px solid #ff3b3b;
+}
+
+/* Sensor Cards */
+.background.light .sensor-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+}
+
+/* Temperature Value */
+.background.light .temp-value {
+  color: #111;
+}
+
+/* Flame Text */
+.background.light .flame-text {
+  color: #333;
+}
+
+/* Activity Log */
+.background.light .activity-log {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+}
+
+.background.light .activity-log h3 {
+  color: #111;
+}
+
+.background.light .activity-log p {
+  color: #444;
+}
+
+/* Buttons */
+.background.light .control-btn {
+  background: rgba(255, 255, 255, 0.9);
+  color: #222;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.background.light .control-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+
+/* ================= DASHBOARD ================= */
+
+.dashboard {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1200px;
+  backdrop-filter: blur(25px);
+  border-radius: 25px;
+  padding: 40px;
+
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Floating effect */
+.dashboard:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.55);
+}
+
+.dark .dashboard {
+  background: rgba(20, 20, 25, 0.6);
+  color: white;
+}
+
+.light .dashboard {
+  background: rgba(255, 255, 255, 0.6);
+  color: #222;
+}
+
+/* ================= HEADER ================= */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+}
+
+/* ================= PREMIUM CONTROL BUTTON ================= */
+
+.control-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  backdrop-filter: blur(15px);
+
+  background: linear-gradient(
+    135deg,
+    rgba(120, 180, 255, 0.5),
+    rgba(200, 120, 255, 0.5),
+    rgba(120, 255, 200, 0.5)
+  );
+
+  background-size: 300% 300%;
+  animation: gradientShift 8s ease infinite;
+
+  color: white;
+
+  transition: all 0.35s ease;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.control-btn:hover {
+  transform: translateY(-4px) scale(1.08);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
+}
+
+.control-btn:active {
+  transform: scale(0.92);
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
+/* ================= CLOCK ================= */
+
+.clock {
+  margin: 20px 0;
+}
+
+/* ================= ALERT ================= */
+
+.alert-banner {
+  background: rgba(255, 0, 0, 0.2);
+  border: 1px solid red;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
+  animation: pulse 1.5s infinite;
+}
+
+/* ================= STATUS CARD ================= */
+
+.status-card {
+  padding: 20px;
+  border-radius: 20px;
+  margin-bottom: 30px;
+  text-align: center;
+  backdrop-filter: blur(20px);
+
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.status-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+}
+
+.safe {
+  border: 1px solid rgba(0, 255, 100, 0.3);
+}
+
+.danger {
+  border: 1px solid red;
+}
+
+/* ================= SENSOR GRID ================= */
+
+.sensor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+/* ================= SENSOR CARDS ================= */
+
+.sensor-card {
+  padding: 30px;
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.1);
+  text-align: center;
+
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+/* Floating effect */
+.sensor-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+}
+
+.progress-ring {
+  margin: 20px auto;
+  display: block;
+  transform: rotate(-90deg);
+}
+
+.temp-value {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* ================= REALISTIC FLAME ================= */
+
+.flame-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+}
+
+.real-flame {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  opacity: 0.3;
+  transition: opacity 0.4s ease;
+}
+
+/* Glow aura */
+.real-flame::before {
+  content: "";
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(255,120,0,0.6), transparent 70%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.flame-container.active .real-flame {
+  opacity: 1;
+}
+
+.flame-container.active .real-flame::before {
+  opacity: 1;
+  animation: fireGlow 2s infinite ease-in-out;
+}
+
+/* Flame flicker */
+.flame-shape {
+  transform-origin: center bottom;
+  animation: flameFlicker 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes flameFlicker {
+  0% { transform: scaleY(1) scaleX(1); }
+  50% { transform: scaleY(1.1) scaleX(0.95); }
+  100% { transform: scaleY(0.95) scaleX(1.05); }
+}
+
+@keyframes fireGlow {
+  0% { transform: translateX(-50%) scale(0.9); opacity: 0.6; }
+  50% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+  100% { transform: translateX(-50%) scale(0.9); opacity: 0.6; }
+}
+
+/* ================= SPARK PARTICLES ================= */
+
+.spark {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, #fff, #ff9800);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.flame-container.active .spark {
+  animation: rise 2.5s infinite ease-in;
+}
+
+.s1 { left: 45%; bottom: 25px; animation-delay: 0s; }
+.s2 { left: 55%; bottom: 15px; animation-delay: 0.6s; }
+.s3 { left: 50%; bottom: 20px; animation-delay: 1.2s; }
+.s4 { left: 48%; bottom: 18px; animation-delay: 1.8s; }
+
+@keyframes rise {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) scale(0.4);
+    opacity: 0;
+  }
+}
+
+
+/* ================= ACTIVITY LOG ================= */
+
+.activity-log {
+  padding: 20px;
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.1);
+
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.activity-log:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+}
+
+/* Flicker Animation */
+@keyframes flameFlicker {
+  0%, 100% { transform: translateX(-50%) scaleY(1); }
+  50% { transform: translateX(-50%) scaleY(1.1); }
+}
+
+/* Sparks */
+
+.spark {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: orange;
+  border-radius: 50%;
+  opacity: 0;
+  animation: sparkRise 2s infinite ease-out;
+}
+
+.spark1 { left: 10%; animation-delay: 0s; }
+.spark2 { left: 30%; animation-delay: 0.5s; }
+.spark3 { left: 60%; animation-delay: 1s; }
+.spark4 { left: 80%; animation-delay: 1.5s; }
+
+@keyframes sparkRise {
+  0% {
+    bottom: 10px;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    bottom: 120px;
+    opacity: 0;
+    transform: translateY(-40px) scale(0.3);
+  }
+}
+
+/* Flame OFF (grayscale outline) */
+
+.flame-off {
+  width: 60px;
+  height: 80px;
+  position: relative;
+}
+
+.flame-outline {
+  width: 100%;
+  height: 100%;
+  border-radius: 50% 50% 50% 50%;
+  background: radial-gradient(circle, #999, #444);
+  opacity: 0.3;
+}
+
+/* ================= PULSE ================= */
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+  70% { box-shadow: 0 0 0 20px rgba(255, 0, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+  .sensor-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* ================= FIRE STYLE THEME TOGGLE ================= */
+
+.theme-toggle {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-track {
+  width: 70px;
+  height: 36px;
+  border-radius: 50px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: all 0.4s ease;
+}
+
+/* DARK MODE */
+.toggle-track.dark {
+  background: linear-gradient(135deg, #14141a, #2b2b45);
+  justify-content: flex-end;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.6);
+}
+
+/* LIGHT MODE */
+.toggle-track.light {
+  background: linear-gradient(135deg, #ff9800, #ff5722);
+  justify-content: flex-start;
+  box-shadow: 0 0 12px rgba(255,87,34,0.6);
+}
+
+.toggle-thumb {
+  width: 26px;
+  height: 26px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.4s ease;
+}
