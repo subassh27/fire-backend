@@ -48,51 +48,59 @@ function App() {
   }, []);
 
   // ✅ FETCH REAL DATA FROM BACKEND
-  useEffect(() => {
-    const fetchData = () => {
-      fetch("https://fire-backend-ipvf.onrender.com/status")
-        .then(res => res.json())
-        .then(result => {
+useEffect(() => {
+  const fetchData = () => {
+    fetch("https://fire-backend-ipvf.onrender.com/status")
+      .then(res => res.json())
+      .then(result => {
         const temp = result.temperature || 0;
-const fireFromBackend = result.fire || false; // true if flame detected or alert from ESP32
+        const fireFromBackend = result.fire || false;
 
-// Fire is true if either flame detected OR temperature > 50
-const fireDetected = fireFromBackend || temp > 50;
-const isAlert = data.fire || data.temperature > 50;
-setData({
-  temperature: temp,
-  flame_value: fireFromBackend, // optional for display
-  fire: fireDetected,
-});
-          setTempHistory(prev => {
-            const updated = [...prev, temp];
-            if (updated.length > 10) updated.shift();
-            return updated;
-          });
+        const fireDetected = fireFromBackend || temp > 50; // temp > 50 triggers alert
+        const isAlert = fireDetected;
 
-          setTimeHistory(prev => {
-            const updated = [...prev, new Date().toLocaleTimeString()];
-            if (updated.length > 10) updated.shift();
-            return updated;
-          });
+        setData({
+          temperature: temp,
+          flame_value: fireFromBackend,
+          fire: fireDetected,
+        });
 
-          setLastUpdated(new Date().toLocaleTimeString());
+        setTempHistory(prev => {
+          const updated = [...prev, temp];
+          if (updated.length > 10) updated.shift();
+          return updated;
+        });
 
-          if (fireDetected) {
-            setLogs(prev => [
-              `🔥 Fire detected at ${new Date().toLocaleTimeString()}`,
-              ...prev.slice(0, 4),
-            ]);
-          }
-        })
-        .catch(err => console.log(err));
-    };
+        setTimeHistory(prev => {
+          const updated = [...prev, new Date().toLocaleTimeString()];
+          if (updated.length > 10) updated.shift();
+          return updated;
+        });
 
-    fetchData();
-    const interval = setInterval(fetchData, 3000);
-    return () => clearInterval(interval);
-  }, []);
+        setLastUpdated(new Date().toLocaleTimeString());
 
+        if (fireDetected) {
+          setLogs(prev => [
+            `🔥 Fire detected at ${new Date().toLocaleTimeString()}`,
+            ...prev.slice(0, 4),
+          ]);
+        }
+
+        // Alarm
+        if (fireDetected && !muted && audioRef.current) {
+          audioRef.current.play().catch(() => {});
+        } else if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+        }
+      })
+      .catch(err => console.log(err));
+  };
+
+  fetchData();
+  const interval = setInterval(fetchData, 3000);
+  return () => clearInterval(interval);
+}, [muted]);
   // Alarm
   useEffect(() => {
   if (!audioRef.current) return;
