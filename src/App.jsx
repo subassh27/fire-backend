@@ -58,7 +58,7 @@ const fireFromBackend = result.fire || false; // true if flame detected or alert
 
 // Fire is true if either flame detected OR temperature > 50
 const fireDetected = fireFromBackend || temp > 50;
-
+const isAlert = data.fire || data.temperature > 50;
 setData({
   temperature: temp,
   flame_value: fireFromBackend, // optional for display
@@ -146,13 +146,13 @@ setData({
           <span>Last updated: {lastUpdated}</span>
         </div>
 
-        {data.fire && (
+        {isAlert && (
           <div className="alert-banner">
             🚨 FIRE ALERT — TAKE ACTION IMMEDIATELY
           </div>
         )}
 
-        <div className={`status-card ${data.fire ? "danger pulse" : "safe"}`}>
+        <div className={`status-card ${isAlert ? "danger pulse" : "safe"}`}>
           <h2>Status</h2>
           <p>{data.fire ? "FIRE DETECTED" : "All Systems Normal"}</p>
         </div>
