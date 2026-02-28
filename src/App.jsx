@@ -53,14 +53,17 @@ function App() {
       fetch("https://fire-backend-ipvf.onrender.com/status")
         .then(res => res.json())
         .then(result => {
-         const temp = result.temperature || 0;
-const fireDetected = result.fire || false;
+        const temp = result.temperature || 0;
+const fireFromBackend = result.fire || false; // true if flame detected or alert from ESP32
+
+// Fire is true if either flame detected OR temperature > 50
+const fireDetected = fireFromBackend || temp > 50;
 
 setData({
   temperature: temp,
+  flame_value: fireFromBackend, // optional for display
   fire: fireDetected,
 });
-
           setTempHistory(prev => {
             const updated = [...prev, temp];
             if (updated.length > 10) updated.shift();
