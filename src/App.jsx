@@ -161,17 +161,17 @@ function App() {
             <svg width="150" height="150" style={{ transform: "rotate(-90deg)" }}>
               <defs>
                 <linearGradient id="safeGradient">
-                  <stop offset="0%" stopColor="#00ce6a" />
-                  <stop offset="40%" stopColor="#056e3b" />
+                  <stop offset="100%" stopColor="#09884b" />
+                  <stop offset="100%" stopColor="#00e677" />
                 </linearGradient>
 
                 <linearGradient id="mediumGradient">
-                  <stop offset="40%" stopColor="#fdcf00" />
-                  <stop offset="70%" stopColor="#ff7b00" />
+                  <stop offset="100%" stopColor="#fdcf00" />
+                  <stop offset="100%" stopColor="#ff7b00" />
                 </linearGradient>
 
                 <linearGradient id="dangerGradient">
-                  <stop offset="70%" stopColor="#ff5252" />
+                  <stop offset="100%" stopColor="#ff5252" />
                   <stop offset="100%" stopColor="#920000" />
                 </linearGradient>
               </defs>
@@ -208,10 +208,10 @@ function App() {
                 <svg viewBox="0 27 119 180" className="flame-svg">
                   <defs>
                     <radialGradient id="fireGradient">
-                      <stop offset="0%" stopColor="#fff176" />
+                      <stop offset="0%" stopColor="#09884b" />
                       <stop offset="40%" stopColor="#ff9800" />
-                      <stop offset="70%" stopColor="#ff5722" />
-                      <stop offset="100%" stopColor="#b71c1c" />
+                      <stop offset="70%" stopColor="#ff7b00" />
+                      <stop offset="100%" stopColor="#920000" />
                     </radialGradient>
                   </defs>
 
