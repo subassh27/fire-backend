@@ -53,15 +53,13 @@ function App() {
       fetch("https://fire-backend-ipvf.onrender.com/status")
         .then(res => res.json())
         .then(result => {
-          const temp = result.temperature || 0;
-          const flame = result.flame || 0;
-          const fireDetected = temp > 32 || flame === 1;
+         const temp = result.temperature || 0;
+const fireDetected = result.fire || false;
 
-          setData({
-            temperature: temp,
-            flame_value: flame,
-            fire: fireDetected,
-          });
+setData({
+  temperature: temp,
+  fire: fireDetected,
+});
 
           setTempHistory(prev => {
             const updated = [...prev, temp];
