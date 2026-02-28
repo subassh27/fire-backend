@@ -162,16 +162,16 @@ function App() {
               <defs>
                 <linearGradient id="safeGradient">
                   <stop offset="0%" stopColor="#00ce6a" />
-                  <stop offset="100%" stopColor="#056e3b" />
+                  <stop offset="40%" stopColor="#056e3b" />
                 </linearGradient>
 
                 <linearGradient id="mediumGradient">
-                  <stop offset="0%" stopColor="#fdcf00" />
-                  <stop offset="100%" stopColor="#ff7b00" />
+                  <stop offset="40%" stopColor="#fdcf00" />
+                  <stop offset="70%" stopColor="#ff7b00" />
                 </linearGradient>
 
                 <linearGradient id="dangerGradient">
-                  <stop offset="0%" stopColor="#ff5252" />
+                  <stop offset="70%" stopColor="#ff5252" />
                   <stop offset="100%" stopColor="#920000" />
                 </linearGradient>
               </defs>
