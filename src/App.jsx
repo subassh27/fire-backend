@@ -113,8 +113,8 @@ function App() {
   const offset = circumference - percentage * circumference;
 
   let gradientId = "safeGradient";
-  if (data.temperature > 30) gradientId = "dangerGradient";
-  else if (data.temperature > 20) gradientId = "mediumGradient";
+  if (data.temperature > 42) gradientId = "dangerGradient";
+  else if (data.temperature > 33) gradientId = "mediumGradient";
 
   return (
     <div className={darkMode ? "background dark" : "background light"}>
