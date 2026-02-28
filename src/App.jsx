@@ -26,7 +26,7 @@ function App() {
     flame_value: 0,
     fire: false,
   });
-
+  const [isAlert, setIsAlert] = useState(false); // ✅ Alert state
   const [logs, setLogs] = useState([]);
   const [time, setTime] = useState(new Date());
   const [lastUpdated, setLastUpdated] = useState("");
@@ -47,72 +47,65 @@ function App() {
     return () => clearInterval(clock);
   }, []);
 
-  // ✅ FETCH REAL DATA FROM BACKEND
-useEffect(() => {
-  const fetchData = () => {
-    fetch("https://fire-backend-ipvf.onrender.com/status")
-      .then(res => res.json())
-      .then(result => {
-        const temp = result.temperature || 0;
-        const fireFromBackend = result.fire || false;
-
-        const fireDetected = fireFromBackend || temp > 50; // temp > 50 triggers alert
-        const isAlert = fireDetected;
-
-        setData({
-          temperature: temp,
-          flame_value: fireFromBackend,
-          fire: fireDetected,
-        });
-
-        setTempHistory(prev => {
-          const updated = [...prev, temp];
-          if (updated.length > 10) updated.shift();
-          return updated;
-        });
-
-        setTimeHistory(prev => {
-          const updated = [...prev, new Date().toLocaleTimeString()];
-          if (updated.length > 10) updated.shift();
-          return updated;
-        });
-
-        setLastUpdated(new Date().toLocaleTimeString());
-
-        if (fireDetected) {
-          setLogs(prev => [
-            `🔥 Fire detected at ${new Date().toLocaleTimeString()}`,
-            ...prev.slice(0, 4),
-          ]);
-        }
-
-        // Alarm
-        if (fireDetected && !muted && audioRef.current) {
-          audioRef.current.play().catch(() => {});
-        } else if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.currentTime = 0;
-        }
-      })
-      .catch(err => console.log(err));
-  };
-
-  fetchData();
-  const interval = setInterval(fetchData, 3000);
-  return () => clearInterval(interval);
-}, [muted]);
-  // Alarm
+  // Fetch data from backend every 3 seconds
   useEffect(() => {
-  if (!audioRef.current) return;
+    const fetchData = () => {
+      fetch("https://fire-backend-ipvf.onrender.com/status")
+        .then(res => res.json())
+        .then(result => {
+          const temp = result.temperature || 0;
+          const fireFromBackend = result.fire || false;
 
-  // Play MP3 if flame detected OR temperature > 50
-  if ((data.fire || data.temperature > 50) && !muted) {
-    audioRef.current.play().catch(() => {});
-  } else {
-    audioRef.current.pause();
-    audioRef.current.currentTime = 0;
-  }
-}, [data.fire, data.temperature, muted]);
+          const fireDetected = fireFromBackend || temp > 50;
+
+          setData({
+            temperature: temp,
+            flame_value: fireFromBackend,
+            fire: fireDetected,
+          });
+
+          setIsAlert(fireDetected); // ✅ update alert state
+
+          setTempHistory(prev => {
+            const updated = [...prev, temp];
+            if (updated.length > 10) updated.shift();
+            return updated;
+          });
+
+          setTimeHistory(prev => {
+            const updated = [...prev, new Date().toLocaleTimeString()];
+            if (updated.length > 10) updated.shift();
+            return updated;
+          });
+
+          setLastUpdated(new Date().toLocaleTimeString());
+
+          if (fireDetected) {
+            setLogs(prev => [
+              `🔥 Fire detected at ${new Date().toLocaleTimeString()}`,
+              ...prev.slice(0, 4),
+            ]);
+          }
+        })
+        .catch(err => console.log(err));
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Alarm MP3
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    if (isAlert && !muted) {
+      audioRef.current.play().catch(() => {});
+    } else {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, [isAlert, muted]);
 
   const radius = 60;
   const circumference = 2 * Math.PI * radius;
@@ -120,11 +113,8 @@ useEffect(() => {
   const offset = circumference - percentage * circumference;
 
   let gradientId = "safeGradient";
-  if (data.temperature > 30) {
-    gradientId = "dangerGradient";
-  } else if (data.temperature > 20) {
-    gradientId = "mediumGradient";
-  }
+  if (data.temperature > 30) gradientId = "dangerGradient";
+  else if (data.temperature > 20) gradientId = "mediumGradient";
 
   return (
     <div className={darkMode ? "background dark" : "background light"}>
@@ -162,13 +152,12 @@ useEffect(() => {
 
         <div className={`status-card ${isAlert ? "danger pulse" : "safe"}`}>
           <h2>Status</h2>
-          <p>{data.fire ? "FIRE DETECTED" : "All Systems Normal"}</p>
+          <p>{isAlert ? "FIRE DETECTED" : "All Systems Normal"}</p>
         </div>
 
         <div className="sensor-grid">
           <div className="sensor-card">
             <h3>Temperature</h3>
-
             <svg width="150" height="150" style={{ transform: "rotate(-90deg)" }}>
               <defs>
                 <linearGradient id="safeGradient">
@@ -213,42 +202,39 @@ useEffect(() => {
           </div>
 
           <div className="sensor-card">
-  <h3>Flame Sensor</h3>
+            <h3>Flame Sensor</h3>
+            <div className={`flame-container ${data.fire ? "active" : ""}`}>
+              <div className="real-flame">
+                <svg viewBox="0 27 119 180" className="flame-svg">
+                  <defs>
+                    <radialGradient id="fireGradient">
+                      <stop offset="0%" stopColor="#fff176" />
+                      <stop offset="40%" stopColor="#ff9800" />
+                      <stop offset="70%" stopColor="#ff5722" />
+                      <stop offset="100%" stopColor="#b71c1c" />
+                    </radialGradient>
+                  </defs>
 
-  <div className={`flame-container ${data.fire ? "active" : ""}`}>
-    <div className="real-flame">
-      <svg viewBox="0 27 119 180" className="flame-svg">
-        <defs>
-          <radialGradient id="fireGradient">
-            <stop offset="0%" stopColor="#fff176" />
-            <stop offset="40%" stopColor="#ff9800" />
-            <stop offset="70%" stopColor="#ff5722" />
-            <stop offset="100%" stopColor="#b71c1c" />
-          </radialGradient>
-        </defs>
+                  <g transform="translate(10,0)">
+                    <path
+                      d="M100 170 C70 130 85 90 100 60 C115 90 130 130 100 170 Z"
+                      fill="url(#fireGradient)"
+                      className="flame-shape"
+                    />
+                  </g>
+                </svg>
 
-        <g transform="translate(10,0)">
-          <path
-            d="M100 170 
-               C70 130 85 90 100 60 
-               C115 90 130 130 100 170 Z"
-            fill="url(#fireGradient)"
-            className="flame-shape"
-          />
-        </g>
-      </svg>
+                <div className="spark s1"></div>
+                <div className="spark s2"></div>
+                <div className="spark s3"></div>
+                <div className="spark s4"></div>
+              </div>
 
-      <div className="spark s1"></div>
-      <div className="spark s2"></div>
-      <div className="spark s3"></div>
-      <div className="spark s4"></div>
-    </div>
-
-    <p className="flame-text">
-      {data.fire ? "Flame Detected" : "No Flame Detected"}
-    </p>
-  </div>
-</div>
+              <p className="flame-text">
+                {data.fire ? "Flame Detected" : "No Flame Detected"}
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="activity-log">
@@ -262,7 +248,6 @@ useEffect(() => {
 
         <div className="sensor-card" style={{ marginTop: "20px" }}>
           <h3>Temperature vs Time</h3>
-
           <Line
             data={{
               labels: timeHistory,
@@ -279,7 +264,7 @@ useEffect(() => {
             options={{
               responsive: true,
               scales: {
-                y: { min: 0, max: 40 }
+                y: { min: 0, max: 80 } // adjust to show higher temps
               }
             }}
           />
