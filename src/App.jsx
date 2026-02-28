@@ -92,15 +92,16 @@ setData({
 
   // Alarm
   useEffect(() => {
-    if (!audioRef.current) return;
+  if (!audioRef.current) return;
 
-    if (data.fire && !muted) {
-      audioRef.current.play().catch(() => {});
-    } else {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-  }, [data.fire, muted]);
+  // Play MP3 if flame detected OR temperature > 50
+  if ((data.fire || data.temperature > 50) && !muted) {
+    audioRef.current.play().catch(() => {});
+  } else {
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+  }
+}, [data.fire, data.temperature, muted]);
 
   const radius = 60;
   const circumference = 2 * Math.PI * radius;
