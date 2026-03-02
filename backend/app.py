@@ -55,7 +55,7 @@ def update():
         # 🔥 Send SMS if fire detected
         if fire or temperature > 50:
             message = client.messages.create(
-                body=f"🔥 ALERT! Fire Detected!\nTemperature: {temperature}°C",
+                body=f"🔥 ALERT! Fire Detected!\nTemperature: {temperature}°C\n\nLIVE MONITOR: https://fire-backend-wheat.vercel.app/",
                 from_=TWILIO_PHONE_NUMBER,
                 to=ALERT_PHONE_NUMBER
             )
