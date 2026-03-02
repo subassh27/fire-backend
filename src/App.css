@@ -521,3 +521,38 @@
   font-size: 14px;
   transition: all 0.4s ease;
 }
+
+/* ================= EMERGENCY TICKER ================= */
+.emergency-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #111;
+  color: #fff;
+  font-size: 18px; /* bigger font */
+  font-weight: 600;
+  padding: 10px 0;
+  overflow: hidden;
+  z-index: 100;
+}
+
+.ticker-wrapper {
+  display: flex;
+  width: 200%; /* enough space for two copies */
+}
+
+.ticker {
+  display: flex;
+  animation: scrollTicker 30s linear infinite;
+}
+
+.ticker span {
+  white-space: nowrap;
+  padding-right: 50px;
+}
+
+/* Smooth scrolling animation */
+@keyframes scrollTicker {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}

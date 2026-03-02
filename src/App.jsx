@@ -111,8 +111,9 @@ function App() {
 
   return (
     <div className={darkMode ? "background dark" : "background light"}>
-      <audio ref={audioRef} src="/alarm.mp3" loop />
-
+      <audio ref={audioRef} src="/alarm.mp3" loop
+      preload="auto" />
+      
       <div className="dashboard">
         <div className="header">
           <h1>🔥 Fire Monitoring Dashboard</h1>
@@ -254,6 +255,28 @@ function App() {
           />
         </div>
       </div>
+<div className="emergency-footer">
+  <div className="ticker-wrapper">
+    <div className="ticker">
+      <span>
+        🔥 Fire Dept: 101 — Evacuate safely! &nbsp; | &nbsp;
+        🚓 Police: 100 — Report emergencies immediately! &nbsp; | &nbsp;
+        🚑 Ambulance: 102 — Medical emergencies, call now! &nbsp; | &nbsp;
+        🔥 Fire Dept: 101 — Follow exit routes calmly! &nbsp; | &nbsp;
+        🚓 Police: 100 — Stay alert and safe! &nbsp; | &nbsp;
+        🚑 Ambulance: 102 — Keep first aid ready!
+      </span>
+      <span>
+        🔥 Fire Dept: 101 — Evacuate safely! &nbsp; | &nbsp;
+        🚓 Police: 100 — Report emergencies immediately! &nbsp; | &nbsp;
+        🚑 Ambulance: 102 — Medical emergencies, call now! &nbsp; | &nbsp;
+        🔥 Fire Dept: 101 — Follow exit routes calmly! &nbsp; | &nbsp;
+        🚓 Police: 100 — Stay alert and safe! &nbsp; | &nbsp;
+        🚑 Ambulance: 102 — Keep first aid ready!
+      </span>
+    </div>
+  </div>
+</div>
     </div>
   );
 }
