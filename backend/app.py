@@ -1,15 +1,34 @@
-from flask import Flask, jsonify, request
+import os
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from twilio.rest import Client
-import os
 
 app = Flask(__name__)
 CORS(app)
 
+# =============================
+# Environment Variables
+# =============================
+TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE_NUMBER = os.environ.get("TWILIO_PHONE_NUMBER")
+ALERT_PHONE_NUMBER = os.environ.get("ALERT_PHONE_NUMBER")
+
+client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
 temperature = 0
 fire = False
 
+# =============================
+# Home Route
+# =============================
+@app.route("/")
+def home():
+    return "🔥 Fire Detection Backend Running Successfully!"
 
+# =============================
+# Status Route
+# =============================
 @app.route("/status")
 def status():
     return jsonify({
@@ -17,45 +36,38 @@ def status():
         "fire": fire
     })
 
-
-@app.route("/test-sms")
-def test_sms():
-    account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
-    auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
-
-    client = Client(account_sid, auth_token)
-
-    message = client.messages.create(
-        body="🔥 Test SMS from Fire Detection Project",
-        from_=os.environ.get("TWILIO_PHONE_NUMBER"),
-        to=os.environ.get("TO_PHONE_NUMBER")
-    )
-
-    return "SMS Sent!"
-
-
+# =============================
+# ESP32 Update Route
+# =============================
 @app.route("/update", methods=["POST"])
 def update():
     global temperature, fire
 
-    data = request.json
-    temperature = data.get("temperature", 0)
-    fire = data.get("fire", False)
+    try:
+        data = request.get_json()
 
-    if temperature > 50 or fire == True:
-        account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
-        auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
+        temperature = data.get("temperature", 0)
+        fire = data.get("fire", False)
 
-        client = Client(account_sid, auth_token)
+        print("Temperature:", temperature)
+        print("Fire:", fire)
 
-        client.messages.create(
-            body=f"🔥 ALERT! Temp: {temperature}, Fire: {fire}",
-            from_=os.environ.get("TWILIO_PHONE_NUMBER"),
-            to=os.environ.get("TO_PHONE_NUMBER")
-        )
+        # 🔥 Send SMS if fire detected
+        if fire or temperature > 50:
+            message = client.messages.create(
+                body=f"🔥 ALERT! Fire Detected!\nTemperature: {temperature}°C",
+                from_=TWILIO_PHONE_NUMBER,
+                to=ALERT_PHONE_NUMBER
+            )
+            print("SMS Sent:", message.sid)
 
-    return jsonify({"message": "Updated successfully"})
+        return jsonify({"message": "Data updated successfully"}), 200
 
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
+# =============================
+# Local Run (Render ignores this)
+# =============================
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
