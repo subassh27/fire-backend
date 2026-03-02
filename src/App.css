@@ -522,53 +522,70 @@
   transition: all 0.4s ease;
 }
 
-/* ================= EMERGENCY SECTION ================= */
+/* ===== EMERGENCY SECTION ===== */
 
 .emergency-section {
-  margin-top: 30px;
-  padding: 25px;
-  border-radius: 20px;
-  backdrop-filter: blur(20px);
-  background: rgba(255, 0, 0, 0.08);
+  margin-top: 25px;
+  padding: 22px;
+  border-radius: 18px;
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.06);
+  transition: 0.3s ease;
+}
+
+.emergency-section h3 {
+  margin-bottom: 18px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+}
+
+/* Emergency Card Container */
+.emergency-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+/* Individual Card */
+.emergency-card {
+  padding: 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  transition: 0.3s ease;
+  cursor: pointer;
   text-align: center;
-  transition: 0.3s ease;
 }
 
-.emergency-section:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(255, 0, 0, 0.25);
+.emergency-card:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.12);
 }
 
-.emergency-buttons {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-top: 15px;
+/* Icon */
+.emergency-icon {
+  font-size: 28px;
+  margin-bottom: 10px;
 }
 
-.emergency-btn {
-  padding: 12px 22px;
-  border-radius: 12px;
+/* Title */
+.emergency-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+/* Number */
+.emergency-number {
+  font-size: 15px;
+  letter-spacing: 1px;
+  opacity: 0.85;
+}
+
+/* Clickable phone link */
+.emergency-card a {
   text-decoration: none;
-  font-weight: bold;
-  color: white;
-  transition: 0.3s ease;
-}
-
-.fire-btn {
-  background: linear-gradient(135deg, #ff3b3b, #b30000);
-}
-
-.ambulance-btn {
-  background: linear-gradient(135deg, #00c853, #007e33);
-}
-
-.emergency-btn-black {
-  background: linear-gradient(135deg, #333, #000);
-}
-
-.emergency-btn:hover {
-  transform: scale(1.08);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  color: inherit;
+  display: block;
 }

@@ -26,7 +26,6 @@ ChartJS.register(
 function App() {
   const [data, setData] = useState({
     temperature: 0,
-    flame_value: 0,
     fire: false,
   });
 
@@ -36,73 +35,87 @@ function App() {
   const [muted, setMuted] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
   const [tempHistory, setTempHistory] = useState([]);
+  const [previousFireState, setPreviousFireState] = useState(false);
+
   const audioRef = useRef(null);
-
-  const toggleMute = () => setMuted(!muted);
-  const toggleTheme = () => setDarkMode(!darkMode);
-
   const maxTemp = 100;
 
+  // Clock
   useEffect(() => {
     const clock = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(clock);
   }, []);
 
+  // Fetch real-time data
   useEffect(() => {
-    const fetchData = () => {
-      fetch("https://fire-backend-ipvf.onrender.com/status")
-        .then((res) => res.json())
-        .then((result) => {
-          const temp = result.temperature || 0;
-          const fireFromBackend = result.fire || false;
-          const fireDetected = fireFromBackend || temp > 50;
+    const fetchData = async () => {
+      try {
+        const res = await fetch(
+          "https://fire-backend-ipvf.onrender.com/status",
+          { cache: "no-store" }
+        );
 
-          setData({
-            temperature: temp,
-            flame_value: fireFromBackend,
-            fire: fireDetected,
-          });
+        if (!res.ok) return;
 
-          const now = new Date();
+        const result = await res.json();
 
-          setTempHistory((prev) => {
-            const updated = [...prev, { temp, timestamp: now }];
-            return updated.filter((item) => now - item.timestamp <= 60000);
-          });
+        const temp =
+          typeof result.temperature === "number"
+            ? result.temperature
+            : parseFloat(result.temperature) || 0;
 
-          setLastUpdated(now.toLocaleTimeString());
+        const fireFromBackend = Boolean(result.fire);
+        const fireDetected = fireFromBackend || temp > 50;
 
-          if (fireDetected) {
-            setLogs((prev) => [
-              `🔥 Fire detected at ${now.toLocaleTimeString()}`,
-              ...prev.slice(0, 4),
-            ]);
-          }
+        setData({
+          temperature: temp,
+          fire: fireDetected,
+        });
 
-          if (fireDetected && !muted && audioRef.current) {
-            audioRef.current.play().catch(() => {});
-          } else if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current.currentTime = 0;
-          }
-        })
-        .catch((err) => console.log(err));
+        const now = new Date();
+        setLastUpdated(now.toLocaleTimeString());
+
+        // Temperature history (last 60 sec)
+        setTempHistory((prev) => {
+          const updated = [...prev, { temp, timestamp: now }];
+          return updated.filter(
+            (item) => now - item.timestamp <= 60000
+          );
+        });
+
+        // Log only when fire state changes
+        if (fireDetected && !previousFireState) {
+          setLogs((prev) => [
+            `🔥 Fire detected at ${now.toLocaleTimeString()}`,
+            ...prev.slice(0, 4),
+          ]);
+        }
+
+        setPreviousFireState(fireDetected);
+
+        // Alarm control
+        if (fireDetected && !muted) {
+          audioRef.current?.play().catch(() => {});
+        } else {
+          audioRef.current?.pause();
+          if (audioRef.current) audioRef.current.currentTime = 0;
+        }
+      } catch (err) {
+        console.log("Fetch error:", err);
+      }
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 1000);
-    return () => clearInterval(interval);
-  }, [muted]);
+    const interval = setInterval(fetchData, 700); // ⚡ faster refresh (0.7s)
 
+    return () => clearInterval(interval);
+  }, [muted, previousFireState]);
+
+  // Circle progress
   const radius = 60;
   const circumference = 2 * Math.PI * radius;
-  const percentage = data.temperature / maxTemp;
+  const percentage = Math.min(data.temperature / maxTemp, 1);
   const offset = circumference - percentage * circumference;
-
-  let gradientId = "safeGradient";
-  if (data.temperature <= 35) gradientId = "safeGradient";
-  else if (data.temperature <= 45) gradientId = "mediumGradient";
-  else gradientId = "dangerGradient";
 
   return (
     <div className={darkMode ? "background dark" : "background light"}>
@@ -111,17 +124,15 @@ function App() {
       <div className="dashboard">
         <div className="header">
           <h1>🔥 Fire Monitoring Dashboard</h1>
+
           <div className="controls">
-            <button className="control-btn" onClick={toggleMute}>
+            <button onClick={() => setMuted(!muted)}>
               {muted ? "🔈" : "🔊"}
             </button>
-            <div className="theme-toggle" onClick={toggleTheme}>
-              <div className={`toggle-track ${darkMode ? "dark" : "light"}`}>
-                <div className="toggle-thumb">
-                  {darkMode ? "🌙" : "⛅"}
-                </div>
-              </div>
-            </div>
+
+            <button onClick={() => setDarkMode(!darkMode)}>
+              {darkMode ? "🌙" : "☀️"}
+            </button>
           </div>
         </div>
 
@@ -136,31 +147,18 @@ function App() {
           </div>
         )}
 
-        <div className={`status-card ${data.fire ? "danger pulse" : "safe"}`}>
+        <div className={`status-card ${data.fire ? "danger" : "safe"}`}>
           <h2>Status</h2>
-          <p>{data.fire ? "FIRE DETECTED" : "All Systems Normal"}</p>
+          <p>
+            {data.fire ? "FIRE DETECTED" : "All Systems Normal"}
+          </p>
         </div>
 
         <div className="sensor-grid">
-          {/* Temperature Card */}
           <div className="sensor-card">
             <h3>Temperature</h3>
-            <svg width="150" height="150" style={{ transform: "rotate(-90deg)" }}>
-              <defs>
-                <linearGradient id="safeGradient">
-                  <stop offset="0%" stopColor="#006400" />
-                  <stop offset="100%" stopColor="#00ff00" />
-                </linearGradient>
-                <linearGradient id="mediumGradient">
-                  <stop offset="0%" stopColor="#ffff66" />
-                  <stop offset="100%" stopColor="#ff9900" />
-                </linearGradient>
-                <linearGradient id="dangerGradient">
-                  <stop offset="0%" stopColor="#ff8080" />
-                  <stop offset="100%" stopColor="#b30000" />
-                </linearGradient>
-              </defs>
 
+            <svg width="150" height="150" style={{ transform: "rotate(-90deg)" }}>
               <circle
                 stroke="#444"
                 fill="transparent"
@@ -169,9 +167,8 @@ function App() {
                 cx="75"
                 cy="75"
               />
-
               <circle
-                stroke={`url(#${gradientId})`}
+                stroke={data.fire ? "#ff3b3b" : "#00ff99"}
                 fill="transparent"
                 strokeWidth="10"
                 strokeDasharray={circumference}
@@ -182,47 +179,34 @@ function App() {
                 cy="75"
               />
             </svg>
+
             <p className="temp-value">{data.temperature} °C</p>
           </div>
 
-          {/* Flame Card */}
           <div className="sensor-card">
             <h3>Flame Sensor</h3>
-            <div className={`flame-container ${data.fire ? "active" : ""}`}>
-              <div className="real-flame">
-                <svg viewBox="0 27 119 180">
-                  <defs>
-                    <radialGradient id="fireGradient">
-                      <stop offset="0%" stopColor="#fff176" />
-                      <stop offset="40%" stopColor="#ff9800" />
-                      <stop offset="70%" stopColor="#ff5722" />
-                      <stop offset="100%" stopColor="#b71c1c" />
-                    </radialGradient>
-                  </defs>
-                  <g transform="translate(10,0)">
-                    <path
-                      d="M100 170 C70 130 85 90 100 60 C115 90 130 130 100 170 Z"
-                      fill="url(#fireGradient)"
-                      className="flame-shape"
-                    />
-                  </g>
-                </svg>
-
-                <div className="spark s1"></div>
-                <div className="spark s2"></div>
-                <div className="spark s3"></div>
-                <div className="spark s4"></div>
-              </div>
-              <p className="flame-text">
-                {data.fire ? "Flame Detected" : "No Flame Detected"}
-              </p>
-            </div>
+            <p>
+              {data.fire
+                ? "🔥 Flame Detected"
+                : "No Flame Detected"}
+            </p>
           </div>
         </div>
 
-        {/* Temperature Chart */}
+        <div className="activity-log">
+          <h3>Recent Activity</h3>
+          {logs.length === 0 ? (
+            <p>No recent alerts</p>
+          ) : (
+            logs.map((log, index) => (
+              <p key={index}>{log}</p>
+            ))
+          )}
+        </div>
+
         <div className="sensor-card" style={{ marginTop: "20px" }}>
           <h3>Temperature vs Time (Last 1 min)</h3>
+
           <Line
             data={{
               labels: tempHistory.map((item) => item.timestamp),
@@ -238,6 +222,7 @@ function App() {
             }}
             options={{
               responsive: true,
+              animation: false, // ⚡ remove chart animation for speed
               scales: {
                 x: {
                   type: "time",
@@ -247,32 +232,6 @@ function App() {
               },
             }}
           />
-        </div>
-
-        {/* 🚨 EMERGENCY SECTION */}
-        <div className="emergency-section">
-          <h3>🚨 Emergency Contacts</h3>
-
-          <div className="emergency-buttons">
-            <a href="tel:101" className="emergency-btn fire-btn">
-              🔥 Fire - 101
-            </a>
-
-            <a href="tel:108" className="emergency-btn ambulance-btn">
-              🚑 Ambulance - 108
-            </a>
-
-            <a href="tel:112" className="emergency-btn emergency-btn-black">
-              🆘 Emergency - 112
-            </a>
-          </div>
-        </div>
-
-        <div className="activity-log">
-          <h3>Recent Activity</h3>
-          {logs.length === 0
-            ? <p>No recent alerts</p>
-            : logs.map((log, index) => <p key={index}>{log}</p>)}
         </div>
       </div>
     </div>
