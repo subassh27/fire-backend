@@ -313,6 +313,13 @@
   transition: opacity 0.4s ease;
 }
 
+/* Make SVG stable */
+.real-flame svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 /* Glow aura */
 .real-flame::before {
   content: "";
@@ -370,6 +377,7 @@
   animation: rise 2.5s infinite ease-in;
 }
 
+/* Spark positions */
 .s1 { left: 45%; bottom: 25px; animation-delay: 0s; }
 .s2 { left: 55%; bottom: 15px; animation-delay: 0.6s; }
 .s3 { left: 50%; bottom: 20px; animation-delay: 1.2s; }
