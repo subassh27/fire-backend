@@ -117,8 +117,8 @@ function App() {
 
   // ✅ Smoke dynamic color
   let smokeColor = "#00ff00";
-  if (data.smokeLevel > 800) smokeColor = "#ff9900";
-  if (data.smokeLevel > 1500) smokeColor = "#ff0000";
+  if (data.smokeLevel > 1600) smokeColor = "#ff9900";
+  if (data.smokeLevel > 2500) smokeColor = "#ff0000";
 
   // ✅ Prediction dynamic color
   let predictionColor = "#00ff00";
@@ -260,9 +260,16 @@ function App() {
         <div className="smart-sensor-grid" style={{ marginTop: "30px" }}>
           <div className="sensor-card">
             <h3>Flammable Gas Detection</h3>
-            <div style={{ fontSize: "22px", marginTop: "15px" }}>
-              {data.flammableGas ? "⚠ Gas Detected" : "Safe"}
-            </div>
+           <div
+  style={{
+    fontSize: "22px",
+    marginTop: "15px",
+    color: data.flammableGas ? "#ff3b3b" : "#22c55e",
+    fontWeight: "600"
+  }}
+>
+  {data.flammableGas ? "⚠ Gas Detected" : "Safe"}
+</div>
           </div>
 
           <div className="sensor-card">
@@ -271,7 +278,7 @@ function App() {
               <div
                 className="smoke-fill"
                 style={{
-                  width: `${Math.min((data.smokeLevel / 2000) * 100, 100)}%`,
+                  width: `${Math.min((data.smokeLevel / 4000) * 100, 100)}%`,
                   background: smokeColor,
                   transition: "width 0.6s ease-in-out",
                 }}
@@ -293,8 +300,12 @@ function App() {
     </p>
   )}
 
-  {data.smokeLevel > 600 && (
+  {data.smokeLevel > 900 && (
     <p>💨 Ensure ventilation. Avoid inhaling smoke.</p>
+  )}
+
+ {data.smokeLevel > 600 && (
+    <p>💚 No precautions required.</p>
   )}
 
   {data.temperature > 45 && (
