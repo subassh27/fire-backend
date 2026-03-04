@@ -300,11 +300,11 @@ function App() {
     </p>
   )}
 
-  {data.smokeLevel > 900 && (
+  {data.smokeLevel >= 900 && (
     <p>💨 Ensure ventilation. Avoid inhaling smoke.</p>
   )}
 
- {data.smokeLevel > 600 && (
+ {data.smokeLevel < 900 && (
     <p>💚 No precautions required.</p>
   )}
 
