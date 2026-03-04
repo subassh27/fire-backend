@@ -261,7 +261,7 @@
 
 .sensor-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 30px;
   margin-bottom: 30px;
 }
@@ -293,6 +293,43 @@
 .temp-value {
   font-size: 22px;
   font-weight: 600;
+}
+
+/* ================= NEW SMART SENSOR CARDS ================= */
+.smart-sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+/* Text colors matching theme */
+.background.dark .sensor-card,
+.background.dark .smart-sensor-grid .sensor-card {
+  color: #fff;
+}
+.background.light .sensor-card,
+.background.light .smart-sensor-grid .sensor-card {
+  color: #222;
+}
+
+/* Smoke Bar Container */
+.smoke-bar {
+  width: 100%;
+  height: 20px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+/* Smoke Bar Fill with gradient */
+.smoke-fill {
+  height: 100%;
+  border-radius: 12px;
+  background: linear-gradient(to right, #00ff00, #ffff00, #ff0000);
+  width: 0%;
+  transition: width 0.6s ease-in-out;
 }
 
 /* ================= REALISTIC FLAME ================= */
@@ -404,6 +441,8 @@
   background: rgba(255, 255, 255, 0.1);
 
   transition: transform 0.35s ease, box-shadow 0.35s ease;
+
+  margin-top:25px;
 }
 
 .activity-log:hover {
@@ -526,10 +565,10 @@
 .emergency-footer {
   position: fixed;
   bottom: 0;
-  width: 100%;
-  background: #111;
+  width: 92%;
+  background: #101013;
   color: #fff;
-  font-size: 18px; /* bigger font */
+  font-size: 16px; /* bigger font */
   font-weight: 600;
   padding: 10px 0;
   overflow: hidden;
@@ -543,12 +582,22 @@
 
 .ticker {
   display: flex;
+}
+
+.ticker-wrapper {
+  display: flex;
+  width: 200%;
   animation: scrollTicker 30s linear infinite;
 }
 
 .ticker span {
   white-space: nowrap;
-  padding-right: 50px;
+  padding-right: 30px;
+}
+
+.precaution-card {
+  text-align: left;
+  line-height:1.6;
 }
 
 /* Smooth scrolling animation */

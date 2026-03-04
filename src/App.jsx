@@ -11,7 +11,7 @@ import {
   Legend,
   TimeScale,
 } from "chart.js";
-import 'chartjs-adapter-date-fns';
+import "chartjs-adapter-date-fns";
 
 ChartJS.register(
   LineElement,
@@ -28,6 +28,8 @@ function App() {
     temperature: 0,
     flame_value: 0,
     fire: false,
+    flammableGas: false,
+    smokeLevel: 0,
   });
 
   const [logs, setLogs] = useState([]);
@@ -35,53 +37,53 @@ function App() {
   const [lastUpdated, setLastUpdated] = useState("");
   const [muted, setMuted] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
-  const [tempHistory, setTempHistory] = useState([]); // [{temp, timestamp}]
+  const [tempHistory, setTempHistory] = useState([]);
   const audioRef = useRef(null);
 
   const toggleMute = () => setMuted(!muted);
   const toggleTheme = () => setDarkMode(!darkMode);
 
-  const maxTemp = 100; // max for circle bar
+  const maxTemp = 100;
 
-  // Clock
   useEffect(() => {
     const clock = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(clock);
   }, []);
 
-  // Fetch real data
   useEffect(() => {
     const fetchData = () => {
       fetch("https://fire-backend-ipvf.onrender.com/status")
-        .then(res => res.json())
-        .then(result => {
+        .then((res) => res.json())
+        .then((result) => {
           const temp = result.temperature || 0;
           const fireFromBackend = result.fire || false;
+          const gasDetected = result.flammableGas || false;
+          const smokeLevel = result.smokeLevel || 0;
           const fireDetected = fireFromBackend || temp > 50;
 
           setData({
             temperature: temp,
             flame_value: fireFromBackend,
             fire: fireDetected,
+            flammableGas: gasDetected,
+            smokeLevel: smokeLevel,
           });
 
           const now = new Date();
-          setTempHistory(prev => {
+          setTempHistory((prev) => {
             const updated = [...prev, { temp, timestamp: now }];
-            // Keep only last 60 seconds
-            return updated.filter(item => now - item.timestamp <= 60000);
+            return updated.filter((item) => now - item.timestamp <= 60000);
           });
 
           setLastUpdated(now.toLocaleTimeString());
 
           if (fireDetected) {
-            setLogs(prev => [
+            setLogs((prev) => [
               `🔥 Fire detected at ${now.toLocaleTimeString()}`,
               ...prev.slice(0, 4),
             ]);
           }
 
-          // Alarm
           if (fireDetected && !muted && audioRef.current) {
             audioRef.current.play().catch(() => {});
           } else if (audioRef.current) {
@@ -89,7 +91,7 @@ function App() {
             audioRef.current.currentTime = 0;
           }
         })
-        .catch(err => console.log(err));
+        .catch((err) => console.log(err));
     };
 
     fetchData();
@@ -97,23 +99,36 @@ function App() {
     return () => clearInterval(interval);
   }, [muted]);
 
-  // Circle bar calculations
   const radius = 60;
   const circumference = 2 * Math.PI * radius;
   const percentage = data.temperature / maxTemp;
   const offset = circumference - percentage * circumference;
 
-  // Gradient color for circle bar
+  let predictionScore = 0;
+  if (data.flammableGas) predictionScore += 40;
+  if (data.temperature > 40) predictionScore += 30;
+  if (data.temperature > 50) predictionScore += 30;
+  if (predictionScore > 100) predictionScore = 100;
+
   let gradientId = "safeGradient";
-  if (data.temperature <= 35) gradientId = "safeGradient";       // green
-  else if (data.temperature <= 45) gradientId = "mediumGradient"; // yellow-orange
-  else gradientId = "dangerGradient";                            // red
+  if (data.temperature <= 35) gradientId = "safeGradient";
+  else if (data.temperature <= 45) gradientId = "mediumGradient";
+  else gradientId = "dangerGradient";
+
+  // ✅ Smoke dynamic color
+  let smokeColor = "#00ff00";
+  if (data.smokeLevel > 800) smokeColor = "#ff9900";
+  if (data.smokeLevel > 1500) smokeColor = "#ff0000";
+
+  // ✅ Prediction dynamic color
+  let predictionColor = "#00ff00";
+  if (predictionScore > 40) predictionColor = "#ff9900";
+  if (predictionScore > 70) predictionColor = "#ff0000";
 
   return (
     <div className={darkMode ? "background dark" : "background light"}>
-      <audio ref={audioRef} src="/alarm.mp3" loop
-      preload="auto" />
-      
+      <audio ref={audioRef} src="/alarm.mp3" loop preload="auto" />
+
       <div className="dashboard">
         <div className="header">
           <h1>🔥 Fire Monitoring Dashboard</h1>
@@ -164,15 +179,7 @@ function App() {
                 </linearGradient>
               </defs>
 
-              <circle
-                stroke="#444"
-                fill="transparent"
-                strokeWidth="10"
-                r={radius}
-                cx="75"
-                cy="75"
-              />
-
+              <circle stroke="#444" fill="transparent" strokeWidth="10" r={radius} cx="75" cy="75" />
               <circle
                 stroke={`url(#${gradientId})`}
                 fill="transparent"
@@ -222,20 +229,15 @@ function App() {
           </div>
         </div>
 
-        <div className="activity-log">
-          <h3>Recent Activity</h3>
-          {logs.length === 0 ? <p>No recent alerts</p> : logs.map((log, index) => <p key={index}>{log}</p>)}
-        </div>
-
         <div className="sensor-card" style={{ marginTop: "20px" }}>
           <h3>Temperature vs Time (Last 1 min)</h3>
           <Line
             data={{
-              labels: tempHistory.map(item => item.timestamp),
+              labels: tempHistory.map((item) => item.timestamp),
               datasets: [
                 {
                   label: "Temperature (°C)",
-                  data: tempHistory.map(item => item.temp),
+                  data: tempHistory.map((item) => item.temp),
                   borderColor: "#ff5722",
                   backgroundColor: "rgba(255,87,34,0.2)",
                   tension: 0.3,
@@ -247,36 +249,111 @@ function App() {
               scales: {
                 x: {
                   type: "time",
-                  time: { unit: "second", displayFormats: { second: 'h:mm:ss' } },
+                  time: { unit: "second", displayFormats: { second: "h:mm:ss" } },
                 },
                 y: { min: 0, max: maxTemp },
               },
             }}
           />
         </div>
-      </div>
-<div className="emergency-footer">
-  <div className="ticker-wrapper">
-    <div className="ticker">
-      <span>
-        🔥 Fire Dept: 101 — Evacuate safely! &nbsp; | &nbsp;
-        🚓 Police: 100 — Report emergencies immediately! &nbsp; | &nbsp;
-        🚑 Ambulance: 102 — Medical emergencies, call now! &nbsp; | &nbsp;
-        🔥 Fire Dept: 101 — Follow exit routes calmly! &nbsp; | &nbsp;
-        🚓 Police: 100 — Stay alert and safe! &nbsp; | &nbsp;
-        🚑 Ambulance: 102 — Keep first aid ready!
-      </span>
-      <span>
-        🔥 Fire Dept: 101 — Evacuate safely! &nbsp; | &nbsp;
-        🚓 Police: 100 — Report emergencies immediately! &nbsp; | &nbsp;
-        🚑 Ambulance: 102 — Medical emergencies, call now! &nbsp; | &nbsp;
-        🔥 Fire Dept: 101 — Follow exit routes calmly! &nbsp; | &nbsp;
-        🚓 Police: 100 — Stay alert and safe! &nbsp; | &nbsp;
-        🚑 Ambulance: 102 — Keep first aid ready!
-      </span>
+
+        <div className="smart-sensor-grid" style={{ marginTop: "30px" }}>
+          <div className="sensor-card">
+            <h3>Flammable Gas Detection</h3>
+            <div style={{ fontSize: "22px", marginTop: "15px" }}>
+              {data.flammableGas ? "⚠ Gas Detected" : "Safe"}
+            </div>
+          </div>
+
+          <div className="sensor-card">
+            <h3>Smoke Level</h3>
+            <div className="smoke-bar">
+              <div
+                className="smoke-fill"
+                style={{
+                  width: `${Math.min((data.smokeLevel / 2000) * 100, 100)}%`,
+                  background: smokeColor,
+                  transition: "width 0.6s ease-in-out",
+                }}
+              ></div>
+            </div>
+            <p style={{ marginTop: "10px" }}>{data.smokeLevel}</p>
+          </div>
+
+<div className="sensor-card precaution-card">
+  <h3>⚠ Precautions</h3>
+
+  {data.flammableGas && (
+    <p>🚪 Open doors and windows immediately.</p>
+  )}
+
+  {data.fire && (
+    <p>
+      🔥 Use fire extinguisher. Do not use water on electrical and oil fires.
+    </p>
+  )}
+
+  {data.smokeLevel > 600 && (
+    <p>💨 Ensure ventilation. Avoid inhaling smoke.</p>
+  )}
+
+  {data.temperature > 45 && (
+    <p>🌡 High temperature detected. Check the cause immediately.</p>
+  )}
+
+  {!data.flammableGas &&
+    !data.fire &&
+    data.smokeLevel <= 600 &&
+    data.temperature <= 45 && (
+      <p>✅ Environment is safe.</p>
+  )}
+</div>
+
+          <div className="sensor-card" style={{ gridColumn: "1 / -1" }}>
+            <h3>🔥 Fire Prediction Level</h3>
+            <div className="prediction-bar">
+              <div
+                className="prediction-fill"
+                style={{
+                  width: `${predictionScore}%`,
+                  background: predictionColor,
+                  transition: "width 0.6s ease-in-out",
+                }}
+              ></div>
+            </div>
+            <p style={{ marginTop: "10px" }}>{predictionScore}% Risk</p>
+          </div>
+        </div>
+
+        <div className="activity-log">
+          <h3>Recent Activity</h3>
+          {logs.length === 0
+            ? <p>No recent alerts</p>
+            : logs.map((log, index) => <p key={index}>{log}</p>)}
+        </div>
+
+        <div class="emergency-footer">
+  <div class="ticker-wrapper">
+
+    <div class="ticker">
+      <span>🚑 Ambulance: 108 – Provide First Aid & Stay Calm</span>
+      <span>🔥 Fire Dept: 101 – Evacuate Safely</span>
+      <span>👮 Police: 100 – Maintain Order & Avoid Panic</span>
+      <span>🏥 Medical Helpline: 102 – Seek Immediate Assistance</span>
+      <span>📞 Disaster Management: 1070 – Follow Official Instructions</span>
     </div>
+
+    <div class="ticker">
+      <span>🚑 Ambulance: 108 – Provide First Aid & Stay Calm</span>
+      <span>🔥 Fire Dept: 101 – Evacuate Safely</span>
+      <span>👮 Police: 100 – Maintain Order & Avoid Panic</span>
+      <span>🏥 Medical Helpline: 102 – Seek Immediate Assistance</span>
+      <span>📞 Disaster Management: 1070 – Follow Official Instructions</span>
+    </div>
+
   </div>
 </div>
+      </div>
     </div>
   );
 }
