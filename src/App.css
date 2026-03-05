@@ -605,3 +605,94 @@
   0% { transform: translateX(0%); }
   100% { transform: translateX(-50%); }
 }
+
+/* ================= MOBILE RESPONSIVE ================= */
+
+/* Tablets */
+@media (max-width: 900px) {
+
+  .dashboard {
+    padding: 25px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .sensor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .smart-sensor-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+/* Mobile Phones */
+@media (max-width: 600px) {
+
+  .dashboard {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  .clock {
+    font-size: 14px;
+  }
+
+  .sensor-card {
+    padding: 20px;
+  }
+
+  .status-card {
+    padding: 15px;
+  }
+
+  .temp-value {
+    font-size: 18px;
+  }
+
+  .control-btn {
+    width: 42px;
+    height: 42px;
+  }
+
+  .toggle-track {
+    width: 60px;
+    height: 30px;
+  }
+
+  .toggle-thumb {
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+  }
+
+  .activity-log {
+    padding: 15px;
+  }
+
+}
+
+/* Very Small Phones */
+@media (max-width: 400px) {
+
+  .dashboard {
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  .sensor-card {
+    padding: 15px;
+  }
+
+}
