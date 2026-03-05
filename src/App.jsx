@@ -259,7 +259,7 @@ function App() {
 
         <div className="smart-sensor-grid" style={{ marginTop: "30px" }}>
           <div className="sensor-card">
-            <h3>Flammable Gas Detection</h3>
+            <h3>Air Quality</h3>
            <div
   style={{
     fontSize: "22px",
@@ -268,7 +268,7 @@ function App() {
     fontWeight: "600"
   }}
 >
-  {data.flammableGas ? "⚠ Gas Detected" : "Safe"}
+  {data.flammableGas ? "⚠ Not good for health" : "Safe"}
 </div>
           </div>
 
