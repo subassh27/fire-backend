@@ -34,7 +34,7 @@ last_prediction_state = False
 last_sms_time = 0
 SMS_COOLDOWN = 30  # seconds
 
-SMOKE_THRESHOLD = 1000
+SMOKE_THRESHOLD = 1600
 PREDICTION_THRESHOLD = 70
 
 # =============================
