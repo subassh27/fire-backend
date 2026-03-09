@@ -343,10 +343,10 @@ function App() {
             : logs.map((log, index) => <p key={index}>{log}</p>)}
         </div>
 
-        <div class="emergency-footer">
-  <div class="ticker-wrapper">
+<div className="emergency-footer">
+  <div className="ticker-wrapper">
 
-    <div class="ticker">
+    <div className="ticker">
       <span>🚑 Ambulance: 108 – Provide First Aid & Stay Calm</span>
       <span>🔥 Fire Dept: 101 – Evacuate Safely</span>
       <span>👮 Police: 100 – Maintain Order & Avoid Panic</span>
@@ -354,7 +354,7 @@ function App() {
       <span>📞 Disaster Management: 1070 – Follow Official Instructions</span>
     </div>
 
-    <div class="ticker">
+    <div className="ticker">
       <span>🚑 Ambulance: 108 – Provide First Aid & Stay Calm</span>
       <span>🔥 Fire Dept: 101 – Evacuate Safely</span>
       <span>👮 Police: 100 – Maintain Order & Avoid Panic</span>

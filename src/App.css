@@ -562,28 +562,77 @@
 }
 
 /* ================= EMERGENCY TICKER ================= */
-.emergency-footer {
+/* EMERGENCY TICKER */
+
+.emergency-footer{
+  position: fixed;
+  bottom: 0;/* EMERGENCY TICKER */
+
+.emergency-footer{
   position: fixed;
   bottom: 0;
-  width: 92%;
-  background: #101013;
-  color: #fff;
-  font-size: 16px; /* bigger font */
+  left: 0;
+  width: 100%;
+  background: transparent;
+  font-size: 16px;
   font-weight: 600;
-  padding: 10px 0;
-  overflow: hidden;
+  padding: 10px 30px;
+  overflow-x: hidden;   /* only hide right overflow */
+  overflow-y: hidden;
   z-index: 100;
 }
 
-.ticker-wrapper {
+/* ticker layout fix */
+.ticker-wrapper{
   display: flex;
-  width: 200%; /* enough space for two copies */
+  white-space: nowrap;
 }
 
-.ticker {
-  display: flex;
+.ticker{
+  display: inline-block;
+  padding-right: 40px;
 }
 
+/* Dark mode */
+.background.dark .emergency-footer{
+  color: #ffffff;
+}
+
+/* Light mode */
+.background.light .emergency-footer{
+  color: #000000;
+}
+  left: 0;
+  width: 100%;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 11px 30px;
+  overflow-x: hidden;   /* only hide right overflow */
+  overflow-y: hidden;
+  z-index: 100;
+}
+
+/* ticker layout fix */
+.ticker-wrapper{
+  display: flex;
+  white-space: nowrap;
+}
+
+.ticker{
+  display: inline-block;
+  padding-right: 40px;
+}
+
+/* Dark mode */
+.background.dark .emergency-footer{
+  color: #ffffff;
+}
+
+/* Light mode */
+.background.light .emergency-footer{
+  color: #000000;
+}
 .ticker-wrapper {
   display: flex;
   width: 200%;
