@@ -32,15 +32,23 @@ last_smoke_state = False
 last_prediction_state = False
 
 last_sms_time = 0
-SMS_COOLDOWN = 30  # seconds
+SMS_COOLDOWN = 30
 
 SMOKE_THRESHOLD = 1600
 PREDICTION_THRESHOLD = 70
 
 # =============================
+# FIRE CONFIRMATION TIMER
+# =============================
+fire_start_time = None
+FIRE_CONFIRMATION_TIME = 2
+
+
+# =============================
 @app.route("/")
 def home():
     return "🔥 Fire Detection Backend Running Successfully!"
+
 
 # =============================
 @app.route("/status")
@@ -53,15 +61,19 @@ def status():
         "firePrediction": firePrediction
     })
 
+
 # =============================
 @app.route("/update", methods=["POST"])
 def update():
+
     global temperature, fire, flammableGas, smokeLevel, firePrediction
     global last_fire_state, last_gas_state
     global last_smoke_state, last_prediction_state
     global last_sms_time
+    global fire_start_time
 
     try:
+
         data = request.get_json(force=True)
 
         if data is None:
@@ -78,76 +90,111 @@ def update():
         current_time = time.time()
 
         # =============================
-        # FIRE SMS
+        # FIRE SMS WITH CONFIRMATION
         # =============================
         if (fire or temperature > 50):
-            if (not last_fire_state) and (current_time - last_sms_time > SMS_COOLDOWN):
-                client.messages.create(
-                    body=f"🔥 FIRE ALERT!\nTemperature: {temperature}°C\n\nEvacuate Safely & Call 101.\nLIVE MONITOR: https://fire-backend-wheat.vercel.app/",
-                    from_=TWILIO_PHONE_NUMBER,
-                    to=ALERT_PHONE_NUMBER
-                )
-                last_sms_time = current_time
-                print("🔥 Fire SMS Sent!")
-                last_fire_state = True
+
+            if fire_start_time is None:
+                fire_start_time = current_time
+
+            fire_duration = current_time - fire_start_time
+
+            if fire_duration >= FIRE_CONFIRMATION_TIME:
+
+                if (not last_fire_state) and (current_time - last_sms_time > SMS_COOLDOWN):
+
+                    client.messages.create(
+                        body=f"🔥 FIRE ALERT!\nTemperature: {temperature}°C\n\nEvacuate Safely & Call 101.\nLIVE MONITOR: https://fire-backend-wheat.vercel.app/",
+                        from_=TWILIO_PHONE_NUMBER,
+                        to=ALERT_PHONE_NUMBER
+                    )
+
+                    last_sms_time = current_time
+                    last_fire_state = True
+
+                    print("🔥 Fire SMS Sent!")
+
         else:
+            fire_start_time = None
             last_fire_state = False
+
 
         # =============================
         # GAS LEAK SMS
         # =============================
         if flammableGas:
+
             if (not last_gas_state) and (current_time - last_sms_time > SMS_COOLDOWN):
+
                 client.messages.create(
                     body=f"⚠ FLAMMABLE GAS DETECTED!\nSmoke Level: {smokeLevel}\n\nPrecautions:\n- Open windows\n- Do NOT switch appliances\n- Avoid sparks\n\nLIVE MONITOR: https://fire-backend-wheat.vercel.app/",
                     from_=TWILIO_PHONE_NUMBER,
                     to=ALERT_PHONE_NUMBER
                 )
+
                 last_sms_time = current_time
-                print("🧪 Gas SMS Sent!")
                 last_gas_state = True
+
+                print("🧪 Gas SMS Sent!")
+
         else:
             last_gas_state = False
+
 
         # =============================
         # HIGH SMOKE LEVEL SMS
         # =============================
         if smokeLevel >= SMOKE_THRESHOLD:
+
             if (not last_smoke_state) and (current_time - last_sms_time > SMS_COOLDOWN):
+
                 client.messages.create(
                     body=f"💨 HIGH SMOKE LEVEL!\nSmoke Level: {smokeLevel}\n\nEvacuate Safely & Improve Ventilation.\nLIVE MONITOR: https://fire-backend-wheat.vercel.app/",
                     from_=TWILIO_PHONE_NUMBER,
                     to=ALERT_PHONE_NUMBER
                 )
+
                 last_sms_time = current_time
-                print("💨 Smoke SMS Sent!")
                 last_smoke_state = True
+
+                print("💨 Smoke SMS Sent!")
+
         else:
             last_smoke_state = False
 
+
         # =============================
-        # FIRE PREDICTION LEVEL SMS
+        # FIRE PREDICTION SMS
         # =============================
         if firePrediction >= PREDICTION_THRESHOLD:
+
             if (not last_prediction_state) and (current_time - last_sms_time > SMS_COOLDOWN):
+
                 client.messages.create(
                     body=f"🔥 FIRE RISK HIGH!\nPrediction Level: {firePrediction}%\n\nEvacuate Safely & Follow Exit Routes.\nCall 101 if needed.\nLIVE MONITOR: https://fire-backend-wheat.vercel.app/",
                     from_=TWILIO_PHONE_NUMBER,
                     to=ALERT_PHONE_NUMBER
                 )
+
                 last_sms_time = current_time
-                print("🔥 Prediction SMS Sent!")
                 last_prediction_state = True
+
+                print("🔥 Prediction SMS Sent!")
+
         else:
             last_prediction_state = False
 
+
         return jsonify({"message": "Data updated successfully"}), 200
 
+
     except Exception as e:
+
         print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 
+# =============================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
