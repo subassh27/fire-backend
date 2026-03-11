@@ -41,7 +41,7 @@ PREDICTION_THRESHOLD = 70
 # FIRE CONFIRMATION TIMER
 # =============================
 fire_start_time = None
-FIRE_CONFIRMATION_TIME = 2
+FIRE_CONFIRMATION_TIME = 1
 
 
 # =============================
