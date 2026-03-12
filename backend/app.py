@@ -32,16 +32,16 @@ last_smoke_state = False
 last_prediction_state = False
 
 last_sms_time = 0
-SMS_COOLDOWN = 30
+SMS_COOLDOWN = 40
 
-SMOKE_THRESHOLD = 1600
+SMOKE_THRESHOLD = 1800
 PREDICTION_THRESHOLD = 70
 
 # =============================
 # FIRE CONFIRMATION TIMER
 # =============================
 fire_start_time = None
-FIRE_CONFIRMATION_TIME = 1
+FIRE_CONFIRMATION_TIME = 0.3
 
 
 # =============================
